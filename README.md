@@ -1,12 +1,28 @@
 homeapp
 =======
 
+Home automation system using simple/cheap components.
+
+  * Arduino boards for sensors and actuators
+  * Raspberry Pi for control board and web server
+  * nRF24L01+ 2.4GHz wireless transceiver chips for remote communication
+  * DS18B20 1-wire digital thermometers
+  * Traditional or solid state 5v relays
+
+
+## Devices (Arduino)
+
+To begin with, you will need the RF24 library: https://github.com/maniacbug/RF24
+
+To drive the thermometers, you also need to download the OneWire library for Arduino: http://www.pjrc.com/teensy/td_libs_OneWire.html
+
+
 ## Controller (Raspberry Pi)
 
 The controller is used to:
-1. Identify the sensors
-2. Recieve data
-3. Send control commands
+  * Identify the sensors
+  * Recieve data
+  * Send control commands
 
 First, get the Pi version of the RF24 library:
 
