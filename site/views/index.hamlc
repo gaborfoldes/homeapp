@@ -1,6 +1,13 @@
 !!!
 %html
+  %head
   %body
-    %h2 Hello
-    %h3=@celsius
+    %h2=@device_name
+    %h3=@timestamp
+    %h1
+      =@celsius
+      &deg;C
+      =@fahrenheit
+      &deg;F
+    
 
