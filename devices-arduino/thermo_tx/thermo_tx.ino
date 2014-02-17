@@ -2,7 +2,7 @@
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
-//#include "printf.h"
+#include "printf.h"
 
 #include <OneWire.h>
 
@@ -15,7 +15,7 @@ OneWire ds(8);
 RF24 radio(9,10);
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t tx_addr = 0xF0F0F0F0E2LL;
+const uint64_t tx_addr = 0xF0F0F0F0E3LL;
 const uint64_t base_addr = 0xF0F0F0F0D2LL;
 
 unsigned long Tf;
@@ -23,8 +23,8 @@ unsigned long Tf;
 void setup(void)
 {
 
-//  Serial.begin(57600);
-//  printf_begin();
+  // Serial.begin(57600);
+  // printf_begin();
 
   //
   // Setup and configure rf radio
@@ -44,7 +44,7 @@ void setup(void)
   radio.openReadingPipe(1,base_addr);
 
   // Dump the configuration of the rf unit for debugging
-  //radio.printDetails();
+  // radio.printDetails();
   
   // Need to wait a few seconds at startup so that the bootloader doesn't think we are in upload mode
   delay(10000);
