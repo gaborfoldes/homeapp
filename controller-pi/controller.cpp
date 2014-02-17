@@ -12,8 +12,8 @@
 RF24 radio("/dev/spidev0.0", 8000000, 25);
 
 // Radio pipe addresses for the 2 nodes to communicate
-const uint64_t pipes[3] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL };
-const char pipe_name[3][64] = { "Base", "Bassinet", "Portable" };
+const uint64_t pipes[4] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL };
+const char pipe_name[4][64] = { "Base", "Bassinet", "Portable", "Nano" };
 
 // log file
 ofstream logfile;
@@ -41,6 +41,7 @@ void setup(void) {
     radio.openWritingPipe(pipes[0]);
     radio.openReadingPipe(1,pipes[1]);
     radio.openReadingPipe(2,pipes[2]);
+    radio.openReadingPipe(3,pipes[3]);
 
   // Start listening
   radio.startListening();
