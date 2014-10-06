@@ -6,6 +6,9 @@
 
 #include "./RF24/librf24-rpi/librf24/RF24.h"
 
+#include <curl/curl.h>
+
+
 /* Declarations */
 
 // Set up radio -- SPI device, speed, CE pin (only CE is NEEDED in RPI)
@@ -55,6 +58,36 @@ void setup(void) {
 
 }
 
+int store_signal(char signal[])
+{
+  CURL *curl;
+  CURLcode res;
+ 
+  curl = curl_easy_init();
+  if(curl) {
+
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(headers, "Accept: application/json");
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+    headers = curl_slist_append(headers, "charsets: utf-8");
+
+    curl_easy_setopt(curl, CURLOPT_URL, "http://192.168.1.101:3080/signal");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, signal);
+
+    res = curl_easy_perform(curl);
+    /* Check for errors */ 
+    if(res != CURLE_OK)
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",
+              curl_easy_strerror(res));
+
+    /* always cleanup */ 
+    curl_easy_cleanup(curl);
+  }
+  return 0;
+}
+
+
 void loop(void) {
     uint8_t pipe_num;
     // if there is data ready
@@ -79,6 +112,7 @@ void loop(void) {
         sprintf(data, "{\"device_id\": \"%" PRIx64 "\", \"device_name\": \"%s\", \"timestamp\": \"%s\", \"celsius\": %.2f, \"fahrenheit\": %.2f}\n",
 		pipes[pipe_num], pipe_name[pipe_num], jsontime, c_temp, f_temp);
         //printf(data);
+        store_signal(data);
 	logfile << data;
 	logfile.flush();
 
@@ -100,13 +134,15 @@ void loop(void) {
 }
 
 
+
+
+
 int main(int argc, char** argv)
 {
-        setup();
-        while(1)
-                loop();
-
-        return 0;
+  setup();
+  while(1)
+    loop();
+  return 0;
 }
 
 
