@@ -1,3 +1,5 @@
+.DS_Store
+
 RF24
 
 lib-cov
@@ -8,6 +10,7 @@ lib-cov
 *.out
 *.pid
 *.gz
+*.db
 
 pids
 logs

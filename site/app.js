@@ -1,19 +1,37 @@
+// Homeapp server
+
 var fs = require('fs');
-var express = require('express');
-var app = express();
 var sys = require('sys');
 var exec = require('child_process').exec;
 
-app.engine('hamlc', require('haml-coffee').__express);
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
+
+var Datastore = require('nedb')
+  , db = new Datastore({ filename: './homeapp.db', autoload: true });
+
+
+app.use(bodyParser.json());
+app.set('view engine', 'ejs');
 
 app.get('/', function(req, res) {
-//  res.send(200);
-  fs.readFile('/data/test_temp', 'utf-8', function(err, data) {
-    if (err) throw err;
-    var lines = data.trim().split('\n');
-    var lastLine = lines.slice(-1);
-    res.render('index.hamlc', JSON.parse(lastLine));
+  res.redirect('/signal/last')
+});
+
+app.get('/signal/last', function(req, res) {
+  db.find({}).sort({ timestamp: -1 }).limit(1).exec(function (err, docs) {
+    console.log(docs);
+    res.render('index.html.ejs', docs[0]);
   });
+});
+
+
+app.post('/signal', function(req, res){
+  console.log('Creating signal:');
+  console.log(req.body);
+  db.insert(req.body);
+  res.status(200).end();
 });
 
 app.get('/xmas/:state', function(req, res){
@@ -28,6 +46,6 @@ app.get('/xmas/:state', function(req, res){
   })
 });
 
-app.listen(80);
-console.log('Listening on port 80');
+app.listen(3080);
+console.log('Listening on port 3080');
 
