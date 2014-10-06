@@ -9,7 +9,7 @@ var app = express();
 var bodyParser = require('body-parser');
 
 var Datastore = require('nedb')
-  , db = new Datastore({ filename: './homeapp.db', autoload: true });
+  , db = new Datastore({ filename: '/data/homeapp.db', autoload: true });
 
 
 app.use(bodyParser.json());
@@ -26,7 +26,6 @@ app.get('/signal/last', function(req, res) {
   });
 });
 
-
 app.post('/signal', function(req, res){
   console.log('Creating signal:');
   console.log(req.body);
@@ -34,18 +33,6 @@ app.post('/signal', function(req, res){
   res.status(200).end();
 });
 
-app.get('/xmas/:state', function(req, res){
-  var onoff = (req.params.state === "on") ? "on" : "off";
-  var child = exec("/home/pi/code/homeapp/controller-pi/light " + onoff, function (error, stdout, stderr) {
-    console.log('stdout: ' + stdout);
-    console.log('stderr: ' + stderr);
-    if (error !== null) {
-      console.log('exec error: ' + error);
-    }
-    res.send(200);
-  })
-});
-
-app.listen(3080);
-console.log('Listening on port 3080');
+app.listen(80);
+console.log('Listening on port 80');
 
