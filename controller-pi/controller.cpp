@@ -71,7 +71,7 @@ int store_signal(char signal[])
     headers = curl_slist_append(headers, "Content-Type: application/json");
     headers = curl_slist_append(headers, "charsets: utf-8");
 
-    curl_easy_setopt(curl, CURLOPT_URL, "http://192.168.1.101:3080/signal");
+    curl_easy_setopt(curl, CURLOPT_URL, "http://localhost/signal");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, signal);
 
