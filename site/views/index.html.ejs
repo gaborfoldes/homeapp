@@ -45,6 +45,10 @@
         stroke-width: 1.5px;
       }
 
+      #device1-chart {
+        width: 100%;
+      }
+
 
     </style>
 
@@ -95,10 +99,11 @@
 
             <h3 id="temperature-data">Temperature sensors</h3>
             
-            <div class="bs-callout bs-callout-info">
+            <div class="bs-callout bs-callout-info" id="device1">
               <h4><%= signals[0].device_name %></h4>
+              <div id="device1-chart"></div>
               <div class="table-responsive">
-                <table class="table">
+                <table class="table table-condensed">
                   <thead>
                     <tr>
                       <th>Time</th>
@@ -130,49 +135,54 @@
 
 <script>
 
+
+var $chart = $('#device1-chart');
+
 function decodeHtml(html) {
     var txt = document.createElement("textarea");
     txt.innerHTML = html;
     return txt.value;
 }
 
-var margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+function drawChart() {
 
-var parseDate = d3.time.format("%d-%b-%y").parse;
+  $chart.empty();
 
-var x = d3.time.scale()
-    .range([0, width]);
-
-var y = d3.scale.linear()
-    .range([height, 0]);
-
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
-
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left");
-
-var line = d3.svg.line()
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.close); });
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-var data = JSON.parse(decodeHtml('<%= JSON.stringify(signals) %>'));
-
+  var margin = {top: 50, right: 50, bottom: 50, left: 50},
+      aspect = 9/16;
+      width = $chart.width() - margin.left - margin.right,
+      height = $chart.width() * aspect - margin.top - margin.bottom;
+  
+  var x = d3.time.scale()
+      .range([0, width]);
+  
+  var y = d3.scale.linear()
+      .range([height, 0]);
+  
+  var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom");
+  
+  var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left");
+  
+  var line = d3.svg.line()
+      .x(function(d) { return x(d.date); })
+      .y(function(d) { return y(d.close); });
+  
+  var svg = d3.select("#device1-chart").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  
+  var data = JSON.parse(decodeHtml('<%= JSON.stringify(signals) %>'));
+  
 
   data.forEach(function(d) {
     d.date = new Date(d.timestamp)
-    console.log(d.date);
-    d.close = +d.celsius;
+    d.close = +d.fahrenheit;
   });
 
   x.domain(d3.extent(data, function(d) { return d.date; }));
@@ -186,18 +196,26 @@ var data = JSON.parse(decodeHtml('<%= JSON.stringify(signals) %>'));
   svg.append("g")
       .attr("class", "y axis")
       .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
+      .append("text")
+      .attr("x", "1.2em")
+      .attr("y", 0)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Celsius");
+      .text("\u2109");
 
   svg.append("path")
       .datum(data)
       .attr("class", "line")
       .attr("d", line);
 
+}
+
+$(function() {
+
+  drawChart();
+  window.onresize = drawChart;
+
+});
 
 </script>
 
