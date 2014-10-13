@@ -11,6 +11,7 @@ var bodyParser = require('body-parser');
 var Datastore = require('nedb')
   , db = new Datastore({ filename: '/data/homeapp.db', autoload: true });
 
+var port = process.argv[2] || 3080;
 
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
@@ -20,9 +21,8 @@ app.get('/', function(req, res) {
 });
 
 app.get('/signal/last', function(req, res) {
-  db.find({}).sort({ timestamp: -1 }).limit(1).exec(function (err, docs) {
-    console.log(docs);
-    res.render('index.html.ejs', docs[0]);
+  db.find({}).sort({ timestamp: -1 }).limit(720).exec(function (err, data) {
+    res.render('index.html.ejs', { signals: data });
   });
 });
 
@@ -33,6 +33,6 @@ app.post('/signal', function(req, res){
   res.status(200).end();
 });
 
-app.listen(80);
-console.log('Listening on port 80');
+app.listen(port);
+console.log('Listening on port ' + port);
 

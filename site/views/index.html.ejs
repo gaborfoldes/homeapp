@@ -1,13 +1,113 @@
-
 <!DOCTYPE html>
-<html>
-  <head></head>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!--link rel="icon" href="../../favicon.ico"-->
+
+    <title>Home</title>
+
+    <!-- Bootstrap core CSS -->
+	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	  <!-- Optional theme -->
+	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="http://getbootstrap.com/assets/css/docs.min.css">
+
+    <style type="text/css">
+      .bs-docs-header {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        font-size: 24px;
+        text-align: left;
+      }
+    </style>
+
+  </head>
+
   <body>
-    <h2><%= device_name %></h2>
-    <h3><%= timestamp %></h3>
-    <h1>
-      <%= celsius %> &deg;C
-      <%= fahrenheit %> &deg;C
-    </h1>
+
+  	<header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+  		<div class="container">
+  			<div class="navbar-header">
+  				<button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+  					<span class="sr-only">Toggle navigation</span>
+  					<span class="icon-bar"></span>
+  					<span class="icon-bar"></span>
+  					<span class="icon-bar"></span>
+  				</button>
+  				<a href="/" class="navbar-brand">374 Tioga</a>
+  			</div>
+  			<nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+  				<ul class="nav navbar-nav">
+  					<li class="active"><a href="#">Dashboard</a></li>
+  				</ul>
+  				<ul class="nav navbar-nav navbar-right">
+  					<li><a href="#">Profile</a></li>
+            <li><a href="#">Settings</a></li>
+  				</ul>
+  			</nav>
+  		</div>
+  	</header>
+
+
+    <!-- Docs page layout -->
+    <div class="bs-docs-header" id="content">
+      <div class="container">
+        <h1>Dashboard</h1>
+      </div>
+    </div>
+
+    <div class="container bs-docs-container">
+
+      <div class="row">
+        <div class="col-md-9" role="main">
+          <div class="bs-docs-section">
+            <h1 id="temperature" class="page-header">Signals received</h1>
+
+            <p class="lead"></p>
+
+
+            <h3 id="temperature-data">Temperature sensors</h3>
+            
+            <div class="bs-callout bs-callout-info">
+              <h4><%= signals[0].device_name %></h4>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Celsius</th>
+                      <th>Fahrenheit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% for (var i = 0; i < signals.length; i++) { %>
+                      <tr>
+                        <td><%= new Date(signals[i].timestamp).toString() %></td>
+                        <td><%= signals[i].celsius.toFixed(2) %> &deg;C</td>
+                        <td><%= signals[i].fahrenheit.toFixed(2) %> &deg;F</td>
+                      </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
   </body>
+
 </html>
