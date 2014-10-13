@@ -21,7 +21,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/signal/last', function(req, res) {
-  db.find({}).sort({ timestamp: -1 }).limit(720).exec(function (err, data) {
+  db.find({}).sort({ timestamp: -1 }).limit(1440).exec(function (err, data) {
     res.render('index.html.ejs', { signals: data });
   });
 });
