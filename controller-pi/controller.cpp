@@ -11,12 +11,19 @@
 
 /* Declarations */
 
+const unsigned int TEMPERATURE = 1;
+const unsigned int MOTION = 2;
+struct Signals {
+  unsigned long sensor_type;
+  unsigned long data;
+};
+
 // Set up radio -- SPI device, speed, CE pin (only CE is NEEDED in RPI)
 RF24 radio("/dev/spidev0.0", 8000000, 25);
 
 // Radio pipe addresses for the 2 nodes to communicate
 const uint64_t pipes[4] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL };
-const char pipe_name[4][64] = { "Base", "Bassinet", "Portable", "Nano" };
+const char pipe_name[4][64] = { "Base", "Kikis room", "Entrance", "Living room" };
 
 // log file
 ofstream logfile;
@@ -94,27 +101,45 @@ void loop(void) {
     if ( radio.available(&pipe_num) )
     {
       // Dump the payloads until we've gotten everything
-      unsigned long got_time;
+
+      time_t now;
+      time(&now);
+      char jsontime[sizeof "2011-10-08T07:07:09Z"];
+      strftime(jsontime, sizeof jsontime, "%FT%TZ", gmtime(&now));
+
       bool done = false;
       while (!done)
       {
-        // Fetch the payload, and see if this was the last one.
-        done = radio.read( &got_time, sizeof(unsigned long) );
 
-        // Spew it
- 	time_t now;
-    	time(&now);
-    	char jsontime[sizeof "2011-10-08T07:07:09Z"];
-    	strftime(jsontime, sizeof jsontime, "%FT%TZ", gmtime(&now));
-	double c_temp = (double)got_time / 100;
-	double f_temp = (c_temp * 9 / 5 ) + 32;
-	char data[255];
-        sprintf(data, "{\"device_id\": \"%" PRIx64 "\", \"device_name\": \"%s\", \"timestamp\": \"%s\", \"celsius\": %.2f, \"fahrenheit\": %.2f}\n",
-		pipes[pipe_num], pipe_name[pipe_num], jsontime, c_temp, f_temp);
-        //printf(data);
-        store_signal(data);
-	logfile << data;
-	logfile.flush();
+        struct Signals signal;
+        char json[255];
+
+        // Fetch the payload, and see if this was the last one.
+        done = radio.read( &signal, sizeof(signal) );
+
+	switch (signal.sensor_type) {
+
+        case MOTION:
+          sprintf(json, "{\"device_id\": \"%" PRIx64 "\", \"device_name\": \"%s\", \"timestamp\": \"%s\", \"motion_detected\": %lu}\n",
+	    pipes[pipe_num], pipe_name[pipe_num], jsontime, signal.data);
+          break;
+
+        case TEMPERATURE:
+	  double c_temp = (double)signal.data / 100;
+	  double f_temp = (c_temp * 9 / 5 ) + 32;
+          sprintf(json, "{\"device_id\": \"%" PRIx64 "\", \"device_name\": \"%s\", \"timestamp\": \"%s\", \"celsius\": %.2f, \"fahrenheit\": %.2f}\n",
+	    pipes[pipe_num], pipe_name[pipe_num], jsontime, c_temp, f_temp);
+          break;
+
+        }
+
+        if (strlen(json) > 0) {
+
+          store_signal(json);
+	  logfile << json;
+	  logfile.flush();
+
+        }
 
 	// Delay just a little bit to let the other unit
 	// make the transition to receiver
