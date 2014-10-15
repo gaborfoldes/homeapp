@@ -17,14 +17,23 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 
 app.get('/', function(req, res) {
-  res.redirect('/signal/last')
+  //res.redirect('/dashboard')
+  res.status(200).end();
 });
 
-app.get('/signal/last', function(req, res) {
-  db.find({}).sort({ timestamp: -1 }).limit(1440).exec(function (err, data) {
-    res.render('index.html.ejs', { signals: data });
+// app.get('/dashboard', function(req, res) {
+//   db.find({}).sort({ timestamp: -1 }).limit(1440).exec(function (err, data) {
+//     res.render('index.html.ejs', { signals: data });
+//   });
+// });
+
+app.get('/devices/:id', function(req, res) {
+  db.find({ device_id: "f0f0f0f0e" + req.params.id }).sort({ timestamp: -1 }).limit(1440).exec(function (err, data) {
+    res.render('device.html.ejs', { signals: data });
   });
 });
+
+
 
 app.post('/signal', function(req, res){
   console.log('Creating signal:');

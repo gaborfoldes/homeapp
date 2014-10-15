@@ -65,7 +65,7 @@
   					<span class="icon-bar"></span>
   					<span class="icon-bar"></span>
   				</button>
-  				<a href="/" class="navbar-brand">374 Tioga</a>
+  				<a href="/" class="navbar-brand">Tioga</a>
   			</div>
   			<nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
   				<ul class="nav navbar-nav">
@@ -83,7 +83,7 @@
     <!-- Docs page layout -->
     <div class="bs-docs-header" id="content">
       <div class="container">
-        <h1>Dashboard</h1>
+        <h1><%= signals[0].device_name %></h1>
       </div>
     </div>
 
@@ -92,37 +92,64 @@
       <div class="row">
         <div class="col-md-9" role="main">
           <div class="bs-docs-section">
+<!-- 
             <h1 id="temperature" class="page-header">Signals received</h1>
-
             <p class="lead"></p>
-
-
             <h3 id="temperature-data">Temperature sensors</h3>
-            
-            <div class="bs-callout bs-callout-info" id="device1">
-              <h4><%= signals[0].device_name %></h4>
-              <div id="device1-chart"></div>
-              <div class="table-responsive">
-                <table class="table table-condensed">
-                  <thead>
-                    <tr>
-                      <th>Time</th>
-                      <th>Celsius</th>
-                      <th>Fahrenheit</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <% for (var i = 0; i < signals.length; i++) { %>
+ -->            
+
+            <% if ("celsius" in signals[0]) { %>
+              <div class="bs-callout bs-callout-info" id="device1">
+                <h4>Temperature</h4>
+                <div id="device1-chart"></div>
+                <div class="table-responsive">
+                  <table class="table table-condensed">
+                    <thead>
                       <tr>
-                        <td><%= new Date(signals[i].timestamp).toString() %></td>
-                        <td><%= signals[i].celsius.toFixed(2) %> &deg;C</td>
-                        <td><%= signals[i].fahrenheit.toFixed(2) %> &deg;F</td>
+                        <th>Time</th>
+                        <th>Celsius</th>
+                        <th>Fahrenheit</th>
                       </tr>
-                    <% } %>
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      <% for (var i = 0; i < signals.length; i++) { %>
+                        <tr>
+                          <td><%= new Date(signals[i].timestamp).toLocaleTimeString() %></td>
+                          <td><%= signals[i].celsius.toFixed(2) %> &deg;C</td>
+                          <td><%= signals[i].fahrenheit.toFixed(2) %> &deg;F</td>
+                        </tr>
+                      <% } %>
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+            <% } %>
+
+            <% if ("motion_detected" in signals[0]) { %>
+              <div class="bs-callout bs-callout-info" id="device1">
+                <h4>Motion sensor</h4>
+                <div id="device1-chart"></div>
+                <div class="table-responsive">
+                  <table class="table table-condensed">
+                    <thead> 
+                      <tr>
+                        <th>Time</th>
+                        <th>Motion detected</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% for (var i = 0; i < signals.length; i++) { %>
+                        <tr>
+                          <td><%= new Date(signals[i].timestamp).toLocaleTimeString() %></td>
+                          <td><%= signals[i].motion_detected %></td>
+                        </tr>
+                      <% } %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            <% } %>
+
 
           </div>
         </div>
@@ -182,7 +209,7 @@ function drawChart() {
 
   data.forEach(function(d) {
     d.date = new Date(d.timestamp)
-    d.close = +d.fahrenheit;
+    d.close = ("fahrenheit" in d) ? d.fahrenheit : 1;
   });
 
   x.domain(d3.extent(data, function(d) { return d.date; }));
