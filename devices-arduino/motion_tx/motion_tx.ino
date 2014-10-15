@@ -4,7 +4,6 @@
 #include "RF24.h"
 #include "printf.h"
 
-#include <OneWire.h>
 
 
 /* Declarations */
@@ -16,19 +15,20 @@ struct Signals {
   unsigned long data;
 };
 
-
-OneWire ds(8);
+int PIR_sensor = 2;
 
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10 
 RF24 radio(9,10);
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t tx_addr = 0xF0F0F0F0E3LL;
+const uint64_t tx_addr = 0xF0F0F0F0E2LL;
 const uint64_t base_addr = 0xF0F0F0F0D2LL;
 
 void setup(void)
 {
 
+  pinMode(PIR_sensor, INPUT);
+  
   // Serial.begin(57600);
   // printf_begin();
 
@@ -62,9 +62,11 @@ void loop(void)
 
     radio.stopListening();
 
+    while (!digitalRead(PIR_sensor)) {}
+    
     struct Signals signal;
-    signal.sensor_type = TEMPERATURE;
-    signal.data = getTemperature();
+    signal.sensor_type = MOTION;
+    signal.data = 1;
 
     // Take the time, and send it.  This will block until complete
     unsigned long time = millis();
@@ -82,55 +84,10 @@ void loop(void)
     radio.startListening();
 
 
-    // Wait 1 min until next read
-    delay(59000);
+    // Wait 10 sec until next read
+    delay(10000);
  
 }
 
-unsigned long getTemperature(void) {
-  
-  byte i;
-  byte present = 0;
-  byte data[12];
-  byte addr[8];
-  
-  int HighByte, LowByte, TReading, SignBit, Tc_100, Tf_100;
-  
-  byte debug;
-  debug = 0;
 
 
-  ds.reset_search();
-  ds.search(addr);
-
-  ds.reset();
-  ds.select(addr);
-  ds.write(0x44,1);         // start conversion, with parasite power on at the end
-
-  delay(1000);     // maybe 750ms is enough, maybe not
-  // we might do a ds.depower() here, but the reset will take care of it.
-
-  present = ds.reset();
-  ds.select(addr);    
-  ds.write(0xBE);         // Read Scratchpad
-
-  for ( i = 0; i < 9; i++) {           // we need 9 bytes
-    data[i] = ds.read();
-  }
-
-  LowByte = data[0];
-  HighByte = data[1];
-  TReading = (HighByte << 8) + LowByte;
-  SignBit = TReading & 0x8000;  // test most sig bit
-  if (SignBit) // negative
-  {
-    TReading = (TReading ^ 0xffff) + 1; // 2's comp
-  }
-  Tc_100 = (6 * TReading) + TReading / 4;    // multiply by (100 * 0.0625) or 6.25
-  //Tf_100 = 3200 + Tc_100 * 9 / 5; 
-
-  return Tc_100;
-
-}
-
-// vim:cin:ai:sts=2 sw=2 ft=cpp
