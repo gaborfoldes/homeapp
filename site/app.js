@@ -1,9 +1,5 @@
 // Homeapp server
 
-var fs = require('fs');
-var sys = require('sys');
-var exec = require('child_process').exec;
-
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -21,26 +17,12 @@ app.get('/', function(req, res) {
   res.status(200).end();
 });
 
-// app.get('/dashboard', function(req, res) {
-//   db.find({}).sort({ timestamp: -1 }).limit(1440).exec(function (err, data) {
-//     res.render('index.html.ejs', { signals: data });
-//   });
-// });
-
 app.get('/devices/:id', function(req, res) {
-  db.find({ device_id: "f0f0f0f0e" + req.params.id }).sort({ timestamp: -1 }).limit(1440).exec(function (err, data) {
+  db.find({ "device.id": "f0f0f0f0e" + req.params.id }).sort({ timestamp: -1 }).limit(1440).exec(function (err, data) {
     res.render('device.html.ejs', { signals: data });
   });
 });
 
-
-
-app.post('/signal', function(req, res){
-  console.log('Creating signal:');
-  console.log(req.body);
-  db.insert(req.body);
-  res.status(200).end();
-});
 
 app.listen(port);
 console.log('Listening on port ' + port);

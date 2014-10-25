@@ -83,7 +83,7 @@
     <!-- Docs page layout -->
     <div class="bs-docs-header" id="content">
       <div class="container">
-        <h1><%= signals[0].device_name %></h1>
+        <h1><%= signals[0].device.name %></h1>
       </div>
     </div>
 
@@ -98,7 +98,7 @@
             <h3 id="temperature-data">Temperature sensors</h3>
  -->            
 
-            <% if ("celsius" in signals[0]) { %>
+            <% if ("data.celsius" in signals[0]) { %>
               <div class="bs-callout bs-callout-info" id="device1">
                 <h4>Temperature</h4>
                 <div id="device1-chart"></div>
@@ -115,8 +115,8 @@
                       <% for (var i = 0; i < signals.length; i++) { %>
                         <tr>
                           <td><%= new Date(signals[i].timestamp).toLocaleTimeString() %></td>
-                          <td><%= signals[i].celsius.toFixed(2) %> &deg;C</td>
-                          <td><%= signals[i].fahrenheit.toFixed(2) %> &deg;F</td>
+                          <td><%= signals[i].data.celsius.toFixed(2) %> &deg;C</td>
+                          <td><%= signals[i].data.fahrenheit.toFixed(2) %> &deg;F</td>
                         </tr>
                       <% } %>
                     </tbody>
