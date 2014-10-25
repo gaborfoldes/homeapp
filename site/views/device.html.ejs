@@ -83,7 +83,7 @@
     <!-- Docs page layout -->
     <div class="bs-docs-header" id="content">
       <div class="container">
-        <h1><%= signals[0].device.name %></h1>
+        <h1><%= signals[0].device.id %></h1>
       </div>
     </div>
 
@@ -98,7 +98,7 @@
             <h3 id="temperature-data">Temperature sensors</h3>
  -->            
 
-            <% if ("data.celsius" in signals[0]) { %>
+            <% if ("timestamp" in signals[0]) { %>
               <div class="bs-callout bs-callout-info" id="device1">
                 <h4>Temperature</h4>
                 <div id="device1-chart"></div>
