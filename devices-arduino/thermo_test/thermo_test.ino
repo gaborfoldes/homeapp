@@ -2,7 +2,7 @@
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
-//#include "printf.h"
+#include "printf.h"
 
 #include <OneWire.h>
 
@@ -23,14 +23,14 @@ OneWire ds(8);
 RF24 radio(9,10);
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t tx_addr = 0xF0F0F0F0E3LL;
+const uint64_t tx_addr = 0xF0F0F0F0E1LL;
 const uint64_t base_addr = 0xF0F0F0F0D2LL;
 
 void setup(void)
 {
 
-  // Serial.begin(57600);
-  // printf_begin();
+  Serial.begin(57600);
+  printf_begin();
 
   //
   // Setup and configure rf radio
@@ -44,7 +44,6 @@ void setup(void)
   // optionally, reduce the payload size.  seems to
   // improve reliability
   //radio.setPayloadSize(8);
-  radio.enableDynamicPayloads();
 
 
   radio.openWritingPipe(tx_addr);
@@ -61,32 +60,14 @@ void loop(void)
 {
   // Repeatedly send the current temperature
 
-    radio.stopListening();
-
     struct Signals signal;
     signal.sensor_type = TEMPERATURE;
     signal.data = getTemperature();
 
     // Take the time, and send it.  This will block until complete
     unsigned long time = millis();
-//    printf("Now sending %lu...",Tf);
-    bool ok = radio.write( &signal, sizeof(signal) );
-    
-/*
-    if (ok)
-      printf("ok...\n\r");
-    else
-      printf("failed.\n\r");
-*/
-
-    // Now, continue listening
-    radio.startListening();
-
-
-    // Wait 1 min until next read
-    delay(59000);
- 
-}
+    printf("%lu C\n",signal.data);
+ }
 
 unsigned long getTemperature(void) {
   
