@@ -15,7 +15,7 @@ struct Signals {
 };
 
 // Set up radio -- SPI device, speed, CE pin (only CE is NEEDED in RPI)
-RF24 radio("/dev/spidev0.0", 8000000, 25);
+RF24 radio("/dev/spidev0.0", 8000000, 24);
 
 // Radio pipe addresses for the 2 nodes to communicate
 const uint64_t pipes[4] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL };
@@ -27,7 +27,7 @@ void setup(void) {
   radio.begin();
   radio.setRetries(15,15);
   radio.setChannel(0x4c);
-  radio.setPALevel(RF24_PA_LOW);
+  radio.setPALevel(RF24_PA_HIGH);
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1,pipes[1]);
   radio.openReadingPipe(2,pipes[2]);

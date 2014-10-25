@@ -19,11 +19,11 @@ struct Signals {
 };
 
 // Set up radio -- SPI device, speed, CE pin (only CE is NEEDED in RPI)
-RF24 radio("/dev/spidev0.0", 8000000, 25);
+RF24 radio("/dev/spidev0.0", 8000000, 24);
 
 // Radio pipe addresses for the 2 nodes to communicate
 const uint64_t pipes[4] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL };
-const char pipe_name[4][64] = { "Base", "Kikis room", "Entrance", "Living room" };
+const char pipe_name[4][64] = { "Base", "Kiki's room", "Entrance", "Living room" };
 
 // log file
 ofstream logfile;
