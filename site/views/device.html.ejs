@@ -83,7 +83,7 @@
     <!-- Docs page layout -->
     <div class="bs-docs-header" id="content">
       <div class="container">
-        <h1><%= signals[0].device.id %></h1>
+        <h1><%= device.name %></h1>
       </div>
     </div>
 
@@ -98,7 +98,7 @@
             <h3 id="temperature-data">Temperature sensors</h3>
  -->            
 
-            <% if ("timestamp" in signals[0]) { %>
+            <% if ("name" in device) { %>
               <div class="bs-callout bs-callout-info" id="device1">
                 <h4>Temperature</h4>
                 <div id="device1-chart"></div>
@@ -112,20 +112,18 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <% for (var i = 0; i < signals.length; i++) { %>
+                      <% for (var signal in device.signals) { %>
                         <tr>
-                          <td><%= new Date(signals[i].timestamp).toLocaleTimeString() %></td>
-                          <td><%= signals[i].data.celsius.toFixed(2) %> &deg;C</td>
-                          <td><%= signals[i].data.fahrenheit.toFixed(2) %> &deg;F</td>
+                          <td><%= new Date(device.signals[signal].timestamp).toLocaleTimeString() %></td>
+                          <td><%= device.signals[signal].data.celsius.toFixed(2) %> &deg;C</td>
+                          <td><%= device.signals[signal].data.fahrenheit.toFixed(2) %> &deg;F</td>
                         </tr>
                       <% } %>
                     </tbody>
                   </table>
                 </div>
               </div>
-            <% } %>
-
-            <% if ("motion_detected" in signals[0]) { %>
+            <% } else if ("motion_detected" in signals[0]) { %>
               <div class="bs-callout bs-callout-info" id="device1">
                 <h4>Motion sensor</h4>
                 <div id="device1-chart"></div>
@@ -204,13 +202,16 @@ function drawChart() {
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   
-  var data = JSON.parse(decodeHtml('<%= JSON.stringify(signals) %>'));
+  var signals = JSON.parse(decodeHtml('<%= JSON.stringify(device.signals) %>'));
   
-
-  data.forEach(function(d) {
-    d.date = new Date(d.timestamp)
-    d.close = ("fahrenheit" in d) ? d.fahrenheit : 1;
-  });
+  var data = [];
+  for (var s in signals) {
+    data.push({
+      date: new Date(signals[s].timestamp),
+      close: signals[s].data.fahrenheit
+    });
+  }
+  console.log(data);
 
   x.domain(d3.extent(data, function(d) { return d.date; }));
   y.domain(d3.extent(data, function(d) { return d.close; }));
