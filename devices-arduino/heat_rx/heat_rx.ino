@@ -11,7 +11,7 @@
 RF24 radio(9,10);
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t tx_addr = 0xF0F0F0F0E3LL;
+const uint64_t tx_addr = 0xF0F0F0F0E4LL;
 const uint64_t base_addr = 0xF0F0F0F0D2LL;
 
 const int heat_ctrl = 8;
@@ -36,6 +36,7 @@ void setup(void)
   // optionally, reduce the payload size.  seems to
   // improve reliability
   //radio.setPayloadSize(8);
+  radio.enableDynamicPayloads();
 
 
   radio.openWritingPipe(tx_addr);
