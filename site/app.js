@@ -22,9 +22,9 @@ app.get('/', function(req, res) {
 
 app.get('/devices/:id', function(req, res) {
 
-  db.child('devices/f0f0f0f0e' + req.params.id).once('value', function (data) {
+  db.child('devices/f0f0f0f0e' + req.params.id + '/signals').startAt(Date.now()-86400000).once('value', function (data) {
   	console.log('GET /devices/' + req.params.id );
-    res.render('device.html.ejs', { device: data.val() });
+    res.render('device.html.ejs', { device: {name: 'Test', signals: data.val() } });
   }, function (e) {
     console.log('The read failed: ' + e.code);
   });
