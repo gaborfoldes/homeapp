@@ -29,20 +29,17 @@ var db = new Firebase('https://vivid-fire-6554.firebaseio.com/');
 
 // Handlers
 
-function process_signal (d) {
-	device = this._addr.toString('hex');
-	c = d.readUInt32BE(0)/100;
-	signal = { timestamp: new Date().toJSON(),
-//		   device: {
-//		     id: this._addr.toString('hex'),
-//		     name: this._name
-//		   },
-		   data: {
-		     celsius: c,
-		     fahrenheit: (c * 9 / 5 ) + 32
-		   }
-		 };
-	db.child('devices/' + device + '/signals').push(signal);
+function store_signal (d) {
+
+	var device = this._addr.toString('hex'),
+            c = d.readUInt32BE(0)/100,
+            f = (c * 9 / 5) + 32;
+
+	db.child('devices/' + device + '/signals').push().setWithPriority(
+	    { timestamp: new Date().toJSON(), data: {celsius: c, fahrenheit: f} },
+	    Firebase.ServerValue.TIMESTAMP
+	);
+	console.log('Device #' + device + ' -- temperature: ' + c + ' C ' + f + ' F');
 }
 
 function error_handler (e) {
@@ -56,15 +53,36 @@ radio.begin(function() {
  
 	console.log('Starting radio...');
 
-	var rx1 = radio.openPipe('rx', 0xF0F0F0F0E1); // Listen at address 
-	var rx3 = radio.openPipe('rx', 0xF0F0F0F0E3); // Listen at address 
+//	var tx1 = radio.openPipe('tx', 0xF0F0F0F0D2);
+	var rx1 = radio.openPipe('rx', 0xF0F0F0F0E1);
+//	var rx3 = radio.openPipe('rx', 0xF0F0F0F0E3);
 
-	db.child('devices/' + rx1._addr.toString('hex') + '/name').set("Kiki's room");
-	db.child('devices/' + rx3._addr.toString('hex') + '/name').set("Living room");
+//	db.child('devices/' + rx1._addr.toString('hex') + '/name').set("Kiki's room");
+//	db.child('devices/' + rx3._addr.toString('hex') + '/name').set("Living room");
+//	db.child('devices/' + tx1._addr.toString('hex') + '/name').set("Heater");
 
-	rx1.on('data', process_signal).on('error', error_handler);
-	rx3.on('data', process_signal).on('error', error_handler);
+	rx1.on('data', store_signal).on('error', error_handler);
+//	rx3.on('data', store_signal).on('error', error_handler);
 
+/*	rx1.on('data', function (d) {
+            var c = d.readUInt32BE(0)/100,
+                f = (c * 9 / 5) + 32;
+
+            if (f < 70.0) {
+                var buf = new Buffer(4);
+                buf.writeUInt32BE(1, 0);
+                console.log("Turning heat on");
+                tx1.write(buf);
+            } else if (f > 74.0) {
+                var buf = new Buffer(4);
+                buf.writeUInt32BE(0, 0);
+                console.log("Turning heat off");
+                tx1.write(buf);
+            }
+
+    //      db.child('devices/' + device + '/signals').push({ timestamp: new Date().toJSON(), data: $
+	});
+*/
 });
 
 
