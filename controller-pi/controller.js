@@ -56,6 +56,8 @@ radio.begin(function() {
 	var tx1 = radio.openPipe('tx', 0xF0F0F0F0D2);
 	db.child('devices/' + tx1._addr.toString('hex') + '/name').set("Heater");
 	db.child('devices/' + tx1._addr.toString('hex') + '/type').set("HVAC");
+//	db.child('devices/' + tx1._addr.toString('hex') + '/temperature').set(72);
+//	db.child('devices/' + tx1._addr.toString('hex') + '/tolerance').set(1.5);
 
 	var rx1 = radio.openPipe('rx', 0xF0F0F0F0E1);
 	db.child('devices/' + rx1._addr.toString('hex') + '/name').set("Kiki's room");
@@ -71,7 +73,12 @@ radio.begin(function() {
             var c = d.readUInt32BE(0)/100,
                 f = (c * 9 / 5) + 32;
 
-            if (f < 70.5) {
+	    db.child('devices/' + tx1._addr.toString('hex')).once('value', function (data) {
+
+		var midpoint = data.val().temperature;
+		var tolerance = data.val().tolerance;
+
+            if (f < midpoint - tolerance) {
                 var buf = new Buffer(4);
                 buf.writeUInt32BE(1, 0);
                 console.log("Turning heat on");
@@ -80,7 +87,7 @@ radio.begin(function() {
 		    { timestamp: new Date().toJSON(), sent: {heat: 1} },
 		    Firebase.ServerValue.TIMESTAMP
 		);
-            } else if (f > 73.5) {
+            } else if (f > midpoint + tolerance) {
                 var buf = new Buffer(4);
                 buf.writeUInt32BE(0, 0);
                 console.log("Turning heat off");
@@ -90,6 +97,8 @@ radio.begin(function() {
 		    Firebase.ServerValue.TIMESTAMP
 		);
             }
+
+	    });
 	});
 
 });
