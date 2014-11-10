@@ -35,7 +35,7 @@ function store_signal (d) {
             c = d.readUInt32BE(0)/100,
             f = (c * 9 / 5) + 32;
 
-	db.child('devices/' + device + '/signals').push().setWithPriority(
+	db.child('signals/' + device).push().setWithPriority(
 	    { timestamp: new Date().toJSON(), data: {celsius: c, fahrenheit: f} },
 	    Firebase.ServerValue.TIMESTAMP
 	);
@@ -53,36 +53,45 @@ radio.begin(function() {
  
 	console.log('Starting radio...');
 
-//	var tx1 = radio.openPipe('tx', 0xF0F0F0F0D2);
+	var tx1 = radio.openPipe('tx', 0xF0F0F0F0D2);
+	db.child('devices/' + tx1._addr.toString('hex') + '/name').set("Heater");
+	db.child('devices/' + tx1._addr.toString('hex') + '/type').set("HVAC");
+
 	var rx1 = radio.openPipe('rx', 0xF0F0F0F0E1);
-//	var rx3 = radio.openPipe('rx', 0xF0F0F0F0E3);
-
-//	db.child('devices/' + rx1._addr.toString('hex') + '/name').set("Kiki's room");
-//	db.child('devices/' + rx3._addr.toString('hex') + '/name').set("Living room");
-//	db.child('devices/' + tx1._addr.toString('hex') + '/name').set("Heater");
-
+	db.child('devices/' + rx1._addr.toString('hex') + '/name').set("Kiki's room");
+	db.child('devices/' + rx1._addr.toString('hex') + '/type').set("Temperature");
 	rx1.on('data', store_signal).on('error', error_handler);
-//	rx3.on('data', store_signal).on('error', error_handler);
 
-/*	rx1.on('data', function (d) {
+	var rx3 = radio.openPipe('rx', 0xF0F0F0F0E3);
+	db.child('devices/' + rx3._addr.toString('hex') + '/name').set("Living room");
+	db.child('devices/' + rx3._addr.toString('hex') + '/type').set("Temperature");
+	rx3.on('data', store_signal).on('error', error_handler);
+
+	rx1.on('data', function (d) {
             var c = d.readUInt32BE(0)/100,
                 f = (c * 9 / 5) + 32;
 
-            if (f < 70.0) {
+            if (f < 70.5) {
                 var buf = new Buffer(4);
                 buf.writeUInt32BE(1, 0);
                 console.log("Turning heat on");
                 tx1.write(buf);
-            } else if (f > 74.0) {
+		db.child('signals/' + tx1._addr.toString('hex')).push().setWithPriority(
+		    { timestamp: new Date().toJSON(), sent: {heat: 1} },
+		    Firebase.ServerValue.TIMESTAMP
+		);
+            } else if (f > 73.5) {
                 var buf = new Buffer(4);
                 buf.writeUInt32BE(0, 0);
                 console.log("Turning heat off");
                 tx1.write(buf);
+		db.child('signals/' + tx1._addr.toString('hex')).push().setWithPriority(
+		    { timestamp: new Date().toJSON(), sent: {heat: 0} },
+		    Firebase.ServerValue.TIMESTAMP
+		);
             }
-
-    //      db.child('devices/' + device + '/signals').push({ timestamp: new Date().toJSON(), data: $
 	});
-*/
+
 });
 
 
