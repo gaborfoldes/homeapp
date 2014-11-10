@@ -52,6 +52,8 @@
 
     </style>
 
+    <script src="https://cdn.firebase.com/js/client/2.0.2/firebase.js"></script>
+
   </head>
 
   <body>
@@ -102,7 +104,7 @@
               <div class="bs-callout bs-callout-info" id="device1">
                 <h4>Temperature</h4>
                 <div id="device1-chart"></div>
-                <div class="table-responsive">
+                <!--div class="table-responsive">
                   <table class="table table-condensed">
                     <thead>
                       <tr>
@@ -112,16 +114,9 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <% for (var signal in device.signals) { %>
-                        <tr>
-                          <td><%= new Date(device.signals[signal].timestamp).toLocaleTimeString() %></td>
-                          <td><%= device.signals[signal].data.celsius.toFixed(2) %> &deg;C</td>
-                          <td><%= device.signals[signal].data.fahrenheit.toFixed(2) %> &deg;F</td>
-                        </tr>
-                      <% } %>
                     </tbody>
                   </table>
-                </div>
+                </div-->
               </div>
             <% } else if ("motion_detected" in signals[0]) { %>
               <div class="bs-callout bs-callout-info" id="device1">
@@ -202,39 +197,47 @@ function drawChart() {
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   
-  var signals = JSON.parse(decodeHtml('<%= JSON.stringify(device.signals) %>'));
+//  var signals = JSON.parse(decodeHtml('<%= JSON.stringify(device.signals) %>'));
+
+  var db = new Firebase('https://vivid-fire-6554.firebaseio.com/');
+  db.child('signals/<%= device.id %>').startAt(Date.now()-86400000).once('value', function (dbdata) {
+
+    var signals = dbdata.val();  
+    var data = [];
+    for (var s in signals) {
+      data.push({
+        date: new Date(signals[s].timestamp),
+        close: signals[s].data.fahrenheit
+      });
+    }
+    console.log(data);
   
-  var data = [];
-  for (var s in signals) {
-    data.push({
-      date: new Date(signals[s].timestamp),
-      close: signals[s].data.fahrenheit
-    });
-  }
-  console.log(data);
-
-  x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain(d3.extent(data, function(d) { return d.close; }));
-
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-      .append("text")
-      .attr("x", "1.2em")
-      .attr("y", 0)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("\u2109");
-
-  svg.append("path")
-      .datum(data)
-      .attr("class", "line")
-      .attr("d", line);
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain(d3.extent(data, function(d) { return d.close; }));
+  
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+  
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("x", "1.2em")
+        .attr("y", 0)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("\u2109");
+  
+    svg.append("path")
+        .datum(data)
+        .attr("class", "line")
+        .attr("d", line);
+  
+  }, function (e) {
+    console.log('The read failed: ' + e.code);
+  });
 
 }
 
