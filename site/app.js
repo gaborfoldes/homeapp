@@ -38,6 +38,11 @@ app.get('/devices/:id', function(req, res) {
 });
 
 
+app.get('/xmas', function(req, res) {
+  res.render('xmas.html.ejs');
+});
+
+
 app.get('/xmas/on', function(req, res) {
     db.child('devices/f0f0f0f0d2/xmas').set(1);
     res.status(200).end();
