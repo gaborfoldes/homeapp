@@ -7,8 +7,8 @@ var bodyParser = require('body-parser');
 // var Datastore = require('nedb')
 //   , db = new Datastore({ filename: '/data/homeapp.db', autoload: true });
 
-//var Firebase = require('firebase');
-//var db = new Firebase('https://vivid-fire-6554.firebaseio.com/');
+var Firebase = require('firebase');
+var db = new Firebase('https://vivid-fire-6554.firebaseio.com/');
 
 var port = process.argv[2] || 3080;
 
@@ -37,6 +37,16 @@ app.get('/devices/:id', function(req, res) {
   // });
 });
 
+
+app.get('/xmas/on', function(req, res) {
+    db.child('devices/f0f0f0f0d2/xmas').set(1);
+    res.status(200).end();
+});
+
+app.get('/xmas/off', function(req, res) {
+    db.child('devices/f0f0f0f0d2/xmas').set(0);
+    res.status(200).end();
+});
 
 app.listen(port);
 console.log('Listening on port ' + port);
