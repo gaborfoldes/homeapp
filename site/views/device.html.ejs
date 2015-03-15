@@ -205,10 +205,12 @@ function drawChart() {
     var signals = dbdata.val();  
     var data = [];
     for (var s in signals) {
-      data.push({
-        date: new Date(signals[s].timestamp),
-        close: signals[s].data.fahrenheit
-      });
+      if (signals[s].data.celsius != 0) {
+        data.push({
+          date: new Date(signals[s].timestamp),
+          close: signals[s].data.fahrenheit
+        });
+      }
     }
     console.log(data);
   
