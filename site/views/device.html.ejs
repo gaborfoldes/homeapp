@@ -205,7 +205,7 @@ function drawChart() {
     var signals = dbdata.val();  
     var data = [];
     for (var s in signals) {
-      if (signals[s].data.celsius != 0) {
+      if (signals[s].data.celsius >= 1) {
         data.push({
           date: new Date(signals[s].timestamp),
           close: signals[s].data.fahrenheit
