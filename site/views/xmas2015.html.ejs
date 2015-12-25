@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+    <!--link rel="icon" href="../../favicon.ico"-->
+
+    <title>Home</title>
+
+    <!-- Bootstrap core CSS -->
+	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	  <!-- Optional theme -->
+	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="http://getbootstrap.com/assets/css/docs.min.css">
+
+    <style>
+      #xmason, #xmasoff {
+        width: 100%;
+        height: 324px;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <center><button id="xmason" type="button" class="btn btn-success btn-lg">On</button></center>
+    <center><button id="xmasoff" type="button" class="btn btn-danger btn-lg">Off</button></center>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/sparkjs/0.5.9/spark.min.js"></script>
+
+    <script>
+      $(function() {
+
+        spark.login({accessToken: 'e4347a6c2c5f936c1e249c215f48a783d9696b31'});
+
+        $("#xmason").on('touchstart', function() {
+
+          spark.getDevice('3c002f000547343337373737', function(err, device) {
+            console.log('Device name: ' + device.name);
+            device.callFunction('xmas', 'on', function(err, data) {
+              if (err) {
+                console.log('An error occurred:', err);
+              } else {
+                console.log('Function called succesfully:', data);
+              }
+            });
+          });
+
+        });
+
+        $("#xmasoff").on('touchstart', function() {
+
+          spark.getDevice('3c002f000547343337373737', function(err, device) {
+            console.log('Device name: ' + device.name);
+            device.callFunction('xmas', 'off', function(err, data) {
+              if (err) {
+                console.log('An error occurred:', err);
+              } else {
+                console.log('Function called succesfully:', data);
+              }
+            });
+          });
+
+        });
+
+
+      });
+    </script>
+
+
+  </body>
+
+</html>
